@@ -9,7 +9,7 @@ class Player(Entity):
         super().__init__(groups)
         self.image = pygame.transform.scale(pygame.image.load('../graphics/test/player.png').convert_alpha(), (64,64))
         self.rect = self.image.get_rect(topleft = (pos))
-        self.hitbox = self.rect.inflate(0,-25)
+        self.hitbox = self.rect.inflate(-6,HITBOX_OFFSET['player'])
         
         # state
         self.status = 'down'
@@ -40,15 +40,21 @@ class Player(Entity):
         
         # stats
         self.stats = {'health': 100, 'stamina': 60, 'attack': 10, 'magic': 4, 'speed': 6}
+        self.max_stats = {'health': 300, 'stamina': 140, 'attack': 20, 'magic' : 10, 'speed': 10}
+        self.upgrade_cost = {'health': 100, 'stamina': 100, 'attack': 100, 'magic' : 100, 'speed': 100}
         self.health = self.stats['health']
         self.stamina = self.stats['stamina']
-        self.exp = 0
+        self.exp = 5000
         self.speed = self.stats['speed']
         
         # receive damage
         self.vulnerable = True
         self.hurt_time = None
         self.invuln_duration = 500
+        
+        # sound
+        self.weapon_sound = pygame.mixer.Sound('../audio/sword.wav')
+        self.weapon_sound.set_volume(0.4)
         
         self.obstacle_sprites = obstacle_sprites
 
@@ -92,6 +98,7 @@ class Player(Entity):
                 self.attacking = True
                 self.attack_time = pygame.time.get_ticks()
                 self.create_attack()
+                self.weapon_sound.play()
             
             # cast
             if keys[pygame.K_LCTRL]:
@@ -193,10 +200,16 @@ class Player(Entity):
         
         return base_dmg + spell_dmg
     
+    def get_value_by_idx(self, idx):
+        return list(self.stats.values())[idx]
+    
+    def get_cost_by_idx(self, idx):
+        return list(self.upgrade_cost.values())[idx]
+    
     def update(self):
         self.input()
         self.cooldowns()
         self.get_status()
         self.animate()
-        self.move(self.speed)
+        self.move(self.stats['speed'])
         self.stamina_recovery()

@@ -5,9 +5,14 @@ from random import randint
 class Magic:
     def __init__(self, animation_player) -> None:
         self.animation_player = animation_player
+        self.sounds = {
+            'heal': pygame.mixer.Sound('../audio/heal.wav'),
+            'flame': pygame.mixer.Sound('../audio/Fire.wav')
+        }
         
     def heal(self, player, strength, cost, groups):
         if player.stamina >= cost:
+            self.sounds['heal'].play()
             player.health += strength
             player.stamina -= cost
             if player.health > player.stats['health']:
@@ -17,6 +22,7 @@ class Magic:
     
     def flame(self, player, cost, groups):
         if player.stamina >= cost:
+            self.sounds['flame'].play()
             player.stamina -= cost
             
             if player.status.split('_')[0] == 'right':

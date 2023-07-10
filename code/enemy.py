@@ -4,7 +4,7 @@ from entity import Entity
 from util import *
 
 class Enemy(Entity):
-    def __init__(self, monster_name, pos, groups, obstacle_sprites, damage_player, trigger_death_particles) -> None:
+    def __init__(self, monster_name, pos, groups, obstacle_sprites, damage_player, trigger_death_particles, add_exp) -> None:
         super().__init__(groups)
         
         self.sprite_type = 'enemy'
@@ -37,11 +37,21 @@ class Enemy(Entity):
         self.attack_cooldown = 400
         self.damage_player = damage_player
         self.trigger_death_particles = trigger_death_particles
+        self.add_exp = add_exp
         
         # invincibility timer
         self.vulnerable = True
         self.hit_time = None
         self.invincibility_timer = 300
+        
+        # sound
+        self.death_sound = pygame.mixer.Sound('../audio/death.wav')
+        self.attack_sound = pygame.mixer.Sound(monster_info['attack_sound'])
+        self.hit_sound = pygame.mixer.Sound('../audio/death.wav')
+        
+        self.death_sound.set_volume(0.2)
+        self.hit_sound.set_volume(0.2)
+        self.attack_sound.set_volume(0.3)
         
     def import_graphics(self, name):
         self.animations = {
@@ -78,6 +88,7 @@ class Enemy(Entity):
             
     def actions(self, player):
         if self.status == 'attack':
+            self.attack_sound.play()
             self.attack_time = pygame.time.get_ticks()
             self.damage_player(self.attack_damage, self.attack_type)
         elif self.status == 'move':
@@ -105,6 +116,7 @@ class Enemy(Entity):
         
     def get_damaged(self, player, attack_type):
         if self.vulnerable:
+            self.hit_sound.play()
             self.direction = self.get_chase_vector(player)[1]
             if attack_type == 'weapon':
                 self.health -= player.get_full_weapon_damage()
@@ -116,7 +128,9 @@ class Enemy(Entity):
     def check_death(self):
         if self.health <= 0:
             self.kill()
+            self.death_sound.play()
             self.trigger_death_particles(self.rect.center, self.monster_name)
+            self.add_exp(self.exp)
             
     def hit_reaction(self):
         if not self.vulnerable:
