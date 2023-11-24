@@ -31,7 +31,7 @@ jobs:
     - name: Create Pull Request
       uses: peter-evans/create-pull-request@v3
       with:
-        token: ${{ secrets.GITHUB_TOKEN }}
+        token: ${{ secrets.QURRAM_TOKEN }}
         branch: cherry-pick-${{ github.event.pull_request.head.ref }}
         title: "Auto Cherry-Pick from PLE"
         body: "This PR is auto-generated to cherry-pick commits from PLE to main."
