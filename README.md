@@ -2,4 +2,4 @@
 This is not a real game. Or is it? RPGMaker style game with Pygame, includes multiple attack types, enemy AI, and tiling
 
 
-Had a lot of fun making this. Maybe I could become a game developer in the future lol
+Had a lot of fun making this. 
